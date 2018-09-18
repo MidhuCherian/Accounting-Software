@@ -1,0 +1,114 @@
+
+
+<form class="form1">
+
+
+
+
+    <a class="btn btn-lg btn-success" [routerLink]="['/invoice/new']">
+        Create New Invoice
+    </a>
+    <div class="row">
+        <div class="col-md-2">
+            <b>Filter by:</b>
+        </div>
+
+
+        <input type="text" [(ngModel)]="listFilter" name="clientName" />
+        <div class="col-md-2">
+            <b>Select Status:</b>
+        </div>
+        <select [(ngModel)]="selected" name="status" placeholder="select" (ngModelChange)="onOptionsSelected($event)">
+            <option *ngFor="let sta of status" [ngValue]="sta">{{sta}}</option>
+        </select>
+    </div>
+    <button (click)="performFilter(filterBy);onOptionsSelected($event)">Search</button>
+    <button (click)="clearSearch()">Clear</button>
+
+    <div class="col-md-2">
+
+
+
+    </div>
+
+    <div class='row'>
+        <div class='col-md-6'>
+            <h3>Filtered by: {{listFilter}} </h3>
+        </div>
+    </div>
+
+
+
+    <!--<div class="row">
+        <app-pagination [offset]="offset" [limit]="1" [size]="invo.length" (pageChange)="onPageChange($event)"></app-pagination>
+    </div> -->
+
+
+
+    <table class="table table-bordered table-striped table-hover table-light">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width:10%">Invoice Number</th>
+
+                <th style="width: 10%">Date Created</th>
+                <th style="width: 10%">Client Name</th>
+                <th style="width: 10%">Amount</th>
+                <th style="width: 10%">Due Date</th>
+                <th style="width: 10%">Status</th>
+
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let inv of filteredInvoice; index as i ">
+
+                <!-- <ng-container *ngIf="i>=offset && i< offset +limit"> -->
+                <td *ngIf="inv.status==='Sent'||inv.status==='Paid'">
+                    <a [routerLink]="['/invoices', inv.invoiceNumber]">{{inv.invoiceNumber}}</a>
+                </td>
+
+
+                <td *ngIf="inv.status==='New'||inv.status==='Draft'">
+                    <a [routerLink]="['/invoices/edit/',inv.invoiceNumber]">{{inv.invoiceNumber}}</a>
+                </td>
+
+
+                <td style="width: 10%">{{inv.dateCreated | date: 'dd/MM/yyyy'}}</td>
+                <td style="width: 10%">{{inv.clientName}} </td>
+                <td style="width: 10%">${{inv.grandTotal|number:'.2-2'}}</td>
+                <td style="width: 10%">{{inv.dateDue | date: 'dd/MM/yyyy'}}</td>
+                <td style="width: 10%">{{inv.status}}</td>
+
+
+
+                <td *ngIf="inv.status==='Draft'" style="width:10%">
+                    <button class="btn btn-default" type="button" (click)="deleteFieldValue(i)">Delete</button>
+                </td>
+                <!-- </ng-container>-->
+
+            </tr>
+
+
+
+        </tbody>
+    </table>
+
+
+
+    <a class="btn btn-lg btn-success" [routerLink]="['/invoice/new']">
+        Create New Invoice
+    </a>
+    <div *ngIf='errorMessage' class='alert alert-danger'>
+        Error: {{ errorMessage }}
+    </div>
+
+
+</form>
+
+
+
+
+
+

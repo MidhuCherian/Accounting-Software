@@ -1,0 +1,218 @@
+<div id="invoicelistscreen">
+    <div class="row">
+        <div class="col-8">
+            <a class="btn btn-secondary" role="button" [routerLink]="['/invoices']">Back To List</a>
+        </div>
+        <div class="col-3">
+            <div class="float-right">
+                <button type="button" class="btn btn-warning" (click)="onReset()">Reset</button>
+                <button type="submit" class="btn btn-primary" (click)="onSubmit()">Save Draft</button>
+            </div>
+        </div>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #invoice="ngForm">
+        <div class="row">
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-4">
+                        <b>Due Date</b>
+                    </div>
+                    <div class="col-7">
+                        <input type="date" [ngModel]="modifyInvoice.dateDue | date:'yyyy-MM-dd'" (ngModelChange)="modifyInvoice.dateDue = $event" name="duedate" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+                        <b>Client Name</b>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" [(ngModel)]="modifyInvoice.clientName" name="clientname" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+                        <b>Client Email</b>
+                    </div>
+                    <div class="col-7">
+                        <input type="email" name="email">
+                    </div>
+                </div>
+
+                <div *ngIf="!showContact" class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-sm btn-link" (click)="addContact()">
+                            Add Contact
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="showContact" class="row"
+                     (mouseenter)="contactHover = true" (mouseleave)="contactHover = false">
+                    <div class="col-4">
+                        <b>Client Contact Person</b>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" [(ngModel)]="modifyInvoice.clientContactPerson" name="clientcontactperson" />
+                    </div>
+                    <div class="col-1">
+                        <button type="button" [class.hidden]="!contactHover"
+                                (click)="removeContact()" 
+                                class="btn btn-outline-danger btn-sm">
+                            <span class="oi oi-x"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="!showAddress" class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-sm btn-link" (click)="addAddress()">
+                            Add Address
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="showAddress" class="row"
+                     (mouseenter)="addressHover = true" (mouseleave)="addressHover = false">
+                    <div class="col-4">
+                        <b>Client Address</b>
+                    </div>
+                    <div class="col-7">
+                        <textarea rows="3" type="text" [(ngModel)]="modifyInvoice.clientContact" name="clientcontact"></textarea>
+                    </div>
+                    <div class="col-1">
+                        <button *ngIf="!requireAddress" type="button"
+                                [class.hidden]="!addressHover" (click)="removeAddress()"
+                                class="btn btn-outline-danger btn-sm">
+                            <span class="oi oi-x"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-6">
+                        <b>Invoice Number</b>
+                    </div>
+                    <div class="col-6">
+                        {{modifyInvoice.invoiceNumber}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <b>Date</b>
+                    </div>
+                    <div class="col-6">
+                        {{modifyInvoice.dateCreated | date: 'dd/MM/yyyy'}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <b>Total</b>
+                    </div>
+                    <div class="col-6">
+                        {{invoiceService.computeTotal(modifyInvoice) |number:'.2-2'}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <b>Includes GST of</b>
+                    </div>
+                    <div class="col-6">
+                        {{invoiceService.computeGST(modifyInvoice) |number:'.2-2'}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <b>Status</b>
+                    </div>
+                    <div class="col-6">
+                        {{modifyInvoice.status}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <b>Description</b>
+            </div>
+            <div class="col-2">
+                <b>Amount</b>
+                <div class="float-right">
+                    <button type="button" class="btn btn-link btn-sm" (click)="addLineItem()">
+                        Add Item
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" *ngFor='let il of modifyInvoice.invoiceLine; index as i; first as isFirst; last as isLast' (mouseenter)="itemHover = i" (mouseleave)="itemHover = -1">
+            <div class="col-6">
+                <input [(ngModel)]="il.description" class="form-control" type="text" name="description{{i}}" />
+            </div>
+            <div class="col-2">
+                <input [ngModel]="il.amount" (ngModelChange)="il.amount=$event"
+                       class="form-control" type="text" name="amount{{i}}" />
+            </div>
+            <div class="col-4">
+                <div [class.hidden]="i!=itemHover">
+                    <button (click)="deleteLineItem(i)" type="button" class="btn btn-outline-danger btn-sm">
+                        <span class="oi oi-x"></span>
+                    </button>
+                    <button *ngIf="!isFirst" (click)="moveItemUp(i)" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Left Align">
+                        <span class="oi oi-arrow-circle-top" aria-hidden="true"></span>
+                    </button>
+                    <button *ngIf="isFirst" style="visibility:hidden" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Left Align">
+                        <span class="oi oi-arrow-circle-top" aria-hidden="true"></span>
+                    </button>
+                    <button *ngIf="!isLast" (click)="moveItemDown(i)" type="button" class="btn btn-outline-secondary btn-sm">
+                        <span class="oi oi-arrow-circle-bottom" aria-hidden="true"></span>
+                    </button>
+                    <button *ngIf="isLast" style="visibility:hidden" type="button" class="btn btn-outline-secondary btn-sm">
+                        <span class="oi oi-arrow-circle-bottom" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8">
+                <div class="float-right">
+                    <button type="button" class="btn btn-link btn-sm" (click)="addLineItem()">
+                        Add Item
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <b>Total</b>
+            </div>
+            <div class="col-2">
+                {{invoiceService.computeTotal(modifyInvoice) |number:'.2-2'}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <b>Includes GST of</b>
+            </div>
+            <div class="col-2">
+                {{invoiceService.computeGST(modifyInvoice) |number:'.2-2'}}
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+

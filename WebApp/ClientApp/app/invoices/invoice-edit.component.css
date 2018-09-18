@@ -1,0 +1,16 @@
+#invoicelistscreen {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+input {
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+}
+
+.hidden {
+    visibility: hidden;
+}
