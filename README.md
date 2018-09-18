@@ -1,5 +1,5 @@
 # Accounting-Software
-front end part of the webpage that shows the list of invoices as list view, detail view of selected invoice list, the pagination and also the searching of invoices.
+front end part of the webpage that shows the invoices as list view, detail view of selected invoice list, pagination and also the searching of invoices.
 # CBA Accounting ClientApp
 
 ## Editor configuration
